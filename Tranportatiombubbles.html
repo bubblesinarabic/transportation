@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>وسائل النقل – النص الحي</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    :root{
+      --bg-light:#F6FBFB;
+      --bg-teal:#A2D9DA;
+      --ink:#112537;
+      --muted:#5B6B77;
+
+      --teal:#42B8BB;         /* logo theme */
+      --teal-soft:#D7F2F2;
+      --pink:#E08499;
+      --pink-soft:#FBE3EA;
+
+      --card:#FFFFFF;
+      --border:#E5E7EB;
+      --shadow:0 8px 24px rgba(0,0,0,.1);
+    }
+
+    body{
+      font-family:'Almarai',sans-serif;
+      background: linear-gradient(135deg,var(--bg-light),var(--bg-teal));
+      margin:0; padding:0;
+      direction:rtl;
+      color:var(--ink);
+    }
+
+    .topbar{
+      position:sticky; top:0; z-index:50;
+      backdrop-filter:blur(10px);
+      background:rgba(246,251,251,.85);
+      border-bottom:1px solid rgba(0,0,0,.08);
+    }
+    .topbar-inner{
+      max-width:1200px; margin:auto;
+      padding:12px 16px;
+      display:flex; justify-content:space-between; align-items:center; gap:12px;
+    }
+    .brand{ direction:ltr; display:flex; align-items:center; gap:10px; }
+    .brand img{ width:72px; height:auto; display:block; }
+    @media (max-width: 780px){ .brand img{ width:56px; } }
+
+    .top-title{ text-align:right; line-height:1.2; }
+    .top-title h1{ margin:0; font-size:20px; color:var(--ink); }
+    .top-title .sub{ font-size:12px; color:var(--muted); margin-top:4px; }
+
+    .app-container{max-width:1200px;margin:24px auto;padding:0 16px;}
+    .layout{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start;}
+    .card{background:var(--card);border-radius:18px;box-shadow:var(--shadow);padding:18px 20px;}
+    .info-card{flex:1;min-width:280px;}
+    .text-card{flex:1.7;min-width:360px;position:relative;background:var(--card);}
+
+    .toolbar{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:12px;
+    }
+    .legend{
+      display:flex; gap:10px; flex-wrap:wrap;
+      font-size:12px; color:var(--muted);
+      align-items:center;
+    }
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:6px 10px; border-radius:999px;
+      border:1px solid var(--border);
+      background:#fff;
+      font-weight:900;
+    }
+    .dot{ width:10px; height:10px; border-radius:999px; display:inline-block; }
+    .dot.noun{ background:var(--teal); }
+    .dot.verb{ background:var(--pink); }
+
+    #textContainer{
+      max-height:620px;
+      overflow-y:scroll;
+      overflow-x:hidden;
+      padding-right:6px;
+      padding-left:0;
+      scrollbar-gutter: stable;
+    }
+    #textContainer::-webkit-scrollbar{ width:12px; }
+    #textContainer::-webkit-scrollbar-track{ background:rgba(0,0,0,0.06); border-radius:999px; }
+    #textContainer::-webkit-scrollbar-thumb{ background:rgba(17,37,55,0.25); border-radius:999px; }
+    #textContainer::-webkit-scrollbar-thumb:hover{ background:rgba(17,37,55,0.35); }
+
+    .line{
+      background: rgba(255,255,255,0.92);
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:12px 12px;
+      margin-bottom:10px;
+      font-size:22px;
+      line-height:2.2;
+    }
+
+    .w{
+      display:inline-block;
+      padding:2px 6px;
+      border-radius:12px;
+      margin:0 1px;
+      transition:180ms ease;
+      cursor:pointer;
+      background:transparent;
+      position:relative;
+    }
+
+    .w.live{ border:1px solid rgba(17,37,55,0.08); }
+    .w.live.noun{
+      color:var(--teal);
+      background:linear-gradient(180deg, rgba(66,184,187,0.08), rgba(66,184,187,0.02));
+    }
+    .w.live.verb{
+      color:var(--pink);
+      background:linear-gradient(180deg, rgba(224,132,153,0.10), rgba(224,132,153,0.03));
+    }
+
+    .w.selected{
+      transform: scale(1.18);
+      outline:3px solid rgba(17,24,39,0.12);
+      box-shadow:0 12px 20px rgba(0,0,0,0.12);
+      z-index:5;
+    }
+    .w.selected.noun{ background:var(--teal-soft); }
+    .w.selected.verb{ background:var(--pink-soft); }
+
+    .info-title{font-size:18px;font-weight:900;margin-bottom:10px;color:#2F4858;}
+    .info-word{font-size:34px;font-weight:900;margin-bottom:6px;color:#111827;line-height:1.2;}
+
+    .info-badges{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;}
+    .badge{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:8px 10px;border-radius:999px;
+      border:1px solid var(--border);
+      background:#fff;
+      font-weight:900;
+      font-size:12px;
+    }
+    .badge .dot{width:10px;height:10px;border-radius:999px;}
+    .badge.noun{ color:var(--teal); }
+    .badge.noun .dot{ background:var(--teal); }
+    .badge.verb{ color:var(--pink); }
+    .badge.verb .dot{ background:var(--pink); }
+
+    .info-translit{
+      font-size:16px;
+      font-weight:900;
+      color:#374151;
+      margin-bottom:10px;
+      direction:ltr;
+      text-align:left;
+      background:#F9FAFB;
+      border:1px solid var(--border);
+      padding:8px 10px;
+      border-radius:12px;
+      display:inline-block;
+    }
+
+    .two-col{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:10px;
+      margin-top:8px;
+    }
+    @media (min-width: 780px){
+      .two-col{ grid-template-columns: 1fr 1fr; }
+    }
+
+    .info-def{
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background:#fff;
+      font-size:14px;
+      line-height:1.7;
+      color:#111827;
+    }
+    .info-def .label{
+      display:block;
+      font-size:12px;
+      color:var(--muted);
+      font-weight:900;
+      margin-bottom:6px;
+    }
+
+    .image-box{
+      margin-top:10px;padding:10px;border-radius:14px;
+      background:#F9FAFB;border:1px solid var(--border);text-align:center;
+    }
+    .image-box img{
+      max-width:100%;
+      max-height:220px;
+      object-fit:contain;
+      border-radius:12px;
+      border:1px solid var(--border);
+    }
+    .img-error{font-size:12px;color:#b91c1c;margin-top:8px;display:none;}
+
+    .audio-btn{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:10px 14px;border-radius:999px;border:none;
+      background:#111827;color:#fff;font-weight:900;
+      cursor:pointer;margin-top:12px;
+    }
+    .audio-btn:disabled{opacity:.45; cursor:not-allowed;}
+    .muted{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.5;}
+
+    /* ✅ Scene player: hidden until mapped word is selected */
+    .scene-box{
+      display:none;
+      margin-top:12px;
+      padding:10px;
+      border-radius:14px;
+      background:#F9FAFB;
+      border:1px solid var(--border);
+    }
+    .scene-box.on{ display:block; }
+
+    .scene-title{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-size:12px;
+      color:var(--muted);
+      font-weight:900;
+      margin-bottom:8px;
+    }
+    #sceneVideo{
+      width:100%;
+      max-height:240px;
+      border-radius:12px;
+      background:#fff;
+      border:1px solid var(--border);
+      object-fit:contain;
+    }
+  </style>
+</head>
+
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <img
+        src="https://raw.githubusercontent.com/bubblesinarabic/transportation/main/BubblesinArabic.png"
+        alt="Bubbles in Arabic Logo">
+    </div>
+
+    <div class="top-title">
+      <h1>وسائل النقل – النص الحي</h1>
+      <div class="sub"> </div>
+    </div>
+  </div>
+</header>
+
+<div class="app-container">
+  <div class="layout">
+
+    <div class="card text-card">
+      <div class="toolbar">
+        <div class="legend">
+          <span class="pill"><span class="dot noun"></span> أسماء / مفردات</span>
+          <span class="pill"><span class="dot verb"></span> أفعال</span>
+        </div>
+      </div>
+      <div id="textContainer"></div>
+    </div>
+
+    <div class="card info-card">
+      <div class="info-title">معلومات الكلمة</div>
+      <div id="infoContent" class="muted">اضغطي على كلمة ملوّنة من النص.</div>
+
+      <!-- ✅ only appears when mapped word is selected -->
+      <div id="sceneBox" class="scene-box">
+        <div class="scene-title">
+          <i data-lucide="film"></i>
+          مشهد مرتبط بالفعل/الكلمة
+        </div>
+        <video id="sceneVideo" playsinline muted controls preload="metadata"></video>
+        <div id="sceneHint" class="muted" style="margin-top:8px;"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  lucide.createIcons();
+
+  function removeTashkeel(t){ return (t||"").replace(/[\u064B-\u0652\u0670\u0640]/g,""); }
+  function stripPunctuation(t){ return (t||"").replace(/[.,!?؟،；؛:"«»…()\[\]]/g,""); }
+  function normalizeArabic(t){
+    return removeTashkeel(t||"")
+      .replace(/[أإآ]/g,"ا")
+      .replace(/ؤ/g,"و")
+      .replace(/ئ/g,"ي")
+      .replace(/ء/g,"")
+      .replace(/ة/g,"ه")
+      .replace(/ى/g,"ي");
+  }
+  function normKey(rawWord){
+    const cleaned = stripPunctuation(rawWord||"");
+    return normalizeArabic(cleaned).trim();
+  }
+
+  // ✅ Assets base (images/audio)
+  const BASE = "https://raw.githubusercontent.com/bubblesinarabic/transportation/main/";
+  const assetUrl = (f)=> BASE + encodeURIComponent(f);
+  const audioUrl = (f)=> BASE + encodeURIComponent(f);
+
+  // ✅ MP4: multi-CDN fallback (fixes "opens but doesn't load" cases)
+  const SCENE_BASES = [
+    "https://cdn.jsdelivr.net/gh/bubblesinarabic/transportation@main/",
+    "https://raw.githubusercontent.com/bubblesinarabic/transportation/main/",
+    "https://media.githubusercontent.com/media/bubblesinarabic/transportation/main/"
+  ];
+  const sceneCandidates = (file) => SCENE_BASES.map(b => b + file);
+
+  const LINES = [
+    "السيارة وسيلة نقل سريعة تساعدنا على الذهاب إلى المدرسة أو التنزه مع العائلة.",
+    "الطائرة تطير في السماء، وتساعدنا في السفر إلى أماكن بعيدة بسرعة.",
+    "الدراجة لها عجلتان، ونستخدمها في اللعب أو التنقل لمسافات قصيرة.",
+    "الدراجة النارية تسير بسرعة ولها محرك قوي مثل السيارة.",
+    "الباخرة نوع من السفن، وهي أكبر وتستخدم للسفر عبر المحيطات.",
+    "الحافلة تأخذ الكثير من الناس في رحلة، مثل الذهاب إلى المدرسة أو العمل.",
+    "القطار يسير على السكك الحديدية، وينقل الناس والبضائع بين المدن بسرعة وراحة.",
+    "المركب يبحر في الماء ويُستخدم لنقل الناس والبضائع عبر الأنهار والبحيرات."
+  ];
+
+  // ✅ Your mapping (normalized + corrected)
+  const VERB_SCENES = {
+    "يسير": "scene_5.mp4",
+    "تطير": "scene_6.mp4",
+    "تسير": "scene_3.mp4",
+    "ينقل": "scene_8.mp4",
+    "السفر": "scene_7.mp4",
+    "ونستخدمها": "scene_2.mp4",
+    "الذهاب": "scene_1.mp4",
+    "تاخذ": "scene_4.mp4"
+  };
+  function sceneForKey(key){ return VERB_SCENES[key] || null; }
+
+  // ✅ Scene UI show/hide + robust play
+  const sceneBox   = document.getElementById("sceneBox");
+  const sceneVideo = document.getElementById("sceneVideo");
+  const sceneHint  = document.getElementById("sceneHint");
+
+  function hideScene(){
+    sceneVideo.pause();
+    sceneVideo.removeAttribute("src");
+    sceneVideo.load();
+    sceneBox.classList.remove("on");
+    sceneHint.textContent = "";
+  }
+
+  function showAndPlayScene(file, label){
+    sceneBox.classList.add("on");
+    sceneHint.textContent = `⏳ جاري تحميل مشهد: ${label || "—"} …`;
+
+    const urls = sceneCandidates(file);
+    let i = 0;
+
+    const tryNext = () => {
+      if(i >= urls.length){
+        sceneHint.textContent = "⚠️ لم يتم تحميل الفيديو. تأكدي من أن الملفات موجودة في GitHub وبأسماء scene_1.mp4 ... scene_8.mp4";
+        return;
+      }
+
+      const url = urls[i++];
+      sceneVideo.pause();
+      sceneVideo.src = url;
+      sceneVideo.load();
+
+      // If this URL fails, fallback to next
+      sceneVideo.onerror = () => tryNext();
+
+      // Try play; if blocked, show hint (still loaded)
+      const p = sceneVideo.play();
+      if(p && typeof p.catch === "function"){
+        p.catch(() => {
+          sceneHint.textContent = "✅ تم التحميل. اضغطي تشغيل داخل الفيديو إذا لم يبدأ تلقائياً.";
+        });
+      }else{
+        sceneHint.textContent = "✅ تم التحميل.";
+      }
+    };
+
+    tryNext();
+  }
+
+  // ✅ Word audio player (unchanged)
+  let wordAudio = null;
+  function playWordAudio(urlOrUrls){
+    const urls = Array.isArray(urlOrUrls) ? urlOrUrls : [urlOrUrls];
+    if(!urls.length || !urls[0]) return;
+
+    if(wordAudio){ wordAudio.pause(); wordAudio.currentTime = 0; }
+    wordAudio = new Audio();
+    let i = 0;
+
+    const tryNext = () => {
+      if(i >= urls.length){ console.warn("All audio URLs failed:", urls); return; }
+      wordAudio.src = urls[i++];
+      wordAudio.play().catch(() => tryNext());
+    };
+
+    wordAudio.onerror = () => tryNext();
+    tryNext();
+  }
+
+  /* ✅ Your original WORD_DATA (kept) */
+  const WORD_DATA = {
+    "السياره": { label:"السيارة", type:"noun", image:"سيارة.png", audio:[audioUrl("السيارة.mp3"), audioUrl("سيارة.mp3")],
+      translit:"as-sayyārah", def_ar:"وسيلة نقل على الطريق.", def_en:"A road vehicle used for transportation."
+    },
+    "الطايره": { label:"الطائرة", type:"noun", image:"طائرة.png", audio:[audioUrl("الطائرة.mp3"), audioUrl("الطائرة.mp3")],
+      translit:"aṭ-ṭā’irah", def_ar:"وسيلة نقل تطير في السماء.", def_en:"An aircraft that flies in the sky."
+    },
+    "الدراجه": { label:"الدراجة", type:"noun", image:"دراجة.png", audio:[audioUrl("الدراجة.mp3"), audioUrl("دراجة.mp3")],
+      translit:"ad-darrājah", def_ar:"وسيلة نقل لها عجلتان.", def_en:"A two-wheeled vehicle (bicycle)."
+    },
+    "الدراجه الناريه": { label:"الدراجة النارية", type:"noun", image:"دراجةنارية.png", audio:[audioUrl("الدراجة النارية.mp3")],
+      translit:"ad-darrājah an-nāriyyah", def_ar:"دراجة تعمل بمحرك.", def_en:"A motorcycle."
+    },
+    "الباخره": { label:"الباخرة", type:"noun", image:"باخرة.png", audio:[audioUrl("الباخرة.mp3"), audioUrl("باخرة.mp3")],
+      translit:"al-bākhirah", def_ar:"نوع من السفن الكبيرة.", def_en:"A large ship/steamer."
+    },
+    "الحافله": { label:"الحافلة", type:"noun", image:"حافلة.png", audio:[audioUrl("الحافلة.mp3"), audioUrl("حافلة.mp3")],
+      translit:"al-ḥāfilah", def_ar:"مركبة تنقل عددًا كبيرًا من الناس.", def_en:"A bus."
+    },
+    "القطار": { label:"القطار", type:"noun", image:"قطار.png", audio:[audioUrl("قطار.mp3")],
+      translit:"al-qiṭār", def_ar:"وسيلة نقل تسير على السكك الحديدية.", def_en:"A train."
+    },
+    "المركب": { label:"المركب", type:"noun", image:"مركب.png", audio:[audioUrl("مركب.mp3")],
+      translit:"al-markab", def_ar:"قارب/وسيلة نقل في الماء.", def_en:"A boat."
+    },
+
+    "وسيله نقل": { label:"وسيلة نقل", type:"noun", image:null, audio:[audioUrl("وسيلة نقل.mp3")],
+      translit:"wasīlat naql", def_ar:"شيء نستخدمه لنقل الناس أو الأشياء.", def_en:"A means of transportation."
+    },
+    "السكك الحديديه": { label:"السكك الحديدية", type:"noun", image:null, audio:[audioUrl("السكك الحديدية.mp3")],
+      translit:"as-sikak al-ḥadīdiyyah", def_ar:"مسارات القطار المصنوعة من الحديد.", def_en:"Railway tracks."
+    },
+    "المركب يبحر": { label:"المركب يبحر", type:"verb", image:null, audio:[audioUrl("المركب يبحر.mp3")],
+      translit:"al-markab yubāḥir", def_ar:"المركب يسير في الماء.", def_en:"The boat sails."
+    },
+    "عبر الانهار": { label:"عبر الأنهار", type:"noun", image:null, audio:[audioUrl("عبر الأنهار.mp3"), audioUrl("عبر الأنهار.mp3")],
+      translit:"‘abr al-anhār", def_ar:"من خلال الأنهار.", def_en:"Across/through rivers."
+    },
+
+    "سريعه": { label:"سريعة", type:"noun", image:null, audio:[audioUrl("سريعة.mp3")],
+      translit:"sarī‘ah", def_ar:"ليست بطيئة.", def_en:"Fast."
+    },
+    "تطير": { label:"تطير", type:"verb", image:null, audio:[audioUrl("تطير.mp3")],
+      translit:"taṭīr", def_ar:"تتحرك في الهواء.", def_en:"To fly."
+    },
+    "تساعدنا": { label:"تساعدنا", type:"verb", image:null, audio:[audioUrl("تساعدنا.mp3")],
+      translit:"tusā‘idunā", def_ar:"تعيننا.", def_en:"Helps us."
+    },
+    "نستخدمها": { label:"نستخدمها", type:"verb", image:null, audio:[audioUrl("نستخدمها.mp3")],
+      translit:"nasta‘miluhā", def_ar:"نستعملها.", def_en:"We use it."
+    },
+    "تسير": { label:"تسير", type:"verb", image:null, audio:[audioUrl("تسير.mp3")],
+      translit:"tasīr", def_ar:"تمشي/تتحرك.", def_en:"Moves/goes."
+    },
+    "ينقل": { label:"ينقل", type:"verb", image:null, audio:[audioUrl("ينقل.mp3")],
+      translit:"yanqul", def_ar:"ينقل من مكان لآخر.", def_en:"Transports."
+    },
+    "تاخذ": { label:"تأخذ", type:"verb", image:null, audio:[audioUrl("تأخذ.mp3"), audioUrl("تأخذ.mp3")],
+      translit:"ta’khudh", def_ar:"تنقل/تأخذ معها.", def_en:"Takes/carries."
+    }
+  };
+
+  const LIVE_KEYS = new Set(Object.keys(WORD_DATA));
+
+  const PHRASES_2 = new Set([
+    "وسيله نقل",
+    "السكك الحديديه",
+    "المركب يبحر",
+    "عبر الانهار",
+    "الدراجه الناريه"
+  ]);
+
+  const ALIASES = {
+    "تأخذ":"تاخذ",
+    "تاخذ":"تاخذ",
+    "الطائره":"الطايره",
+    "طائره":"الطايره"
+  };
+  const resolveKey = (k)=> ALIASES[k] || k;
+
+  const textContainer = document.getElementById("textContainer");
+  const infoContent = document.getElementById("infoContent");
+  let allWordSpans = [];
+
+  function splitWords(line){ return line.split(" ").filter(Boolean); }
+
+  function renderLines(lines){
+    textContainer.innerHTML = "";
+    allWordSpans = [];
+
+    lines.forEach((line) => {
+      const lineDiv = document.createElement("div");
+      lineDiv.className = "line";
+
+      const tokens = splitWords(line);
+      let i = 0;
+
+      while(i < tokens.length){
+        const t1 = tokens[i];
+        const t2 = tokens[i+1] || "";
+
+        const n1 = resolveKey(normKey(t1));
+        const n2 = resolveKey(normKey(t2));
+        const phrase2 = (n1 && n2) ? (n1 + " " + n2) : "";
+
+        let useText = removeTashkeel(t1);
+        let useKey  = n1;
+        let step = 1;
+
+        if(phrase2 && PHRASES_2.has(phrase2) && LIVE_KEYS.has(phrase2)){
+          useText = removeTashkeel(t1) + " " + removeTashkeel(t2);
+          useKey  = phrase2;
+          step = 2;
+        }
+
+        const s = document.createElement("span");
+        s.className = "w";
+        s.textContent = useText;
+        s.dataset.key = useKey;
+
+        if(LIVE_KEYS.has(useKey)){
+          const t = WORD_DATA[useKey].type || "noun";
+          s.classList.add("live", t);
+        }
+
+        lineDiv.appendChild(s);
+        if(i + step < tokens.length) lineDiv.appendChild(document.createTextNode(" "));
+        allWordSpans.push(s);
+
+        i += step;
+      }
+
+      textContainer.appendChild(lineDiv);
+    });
+  }
+
+  function clearSelected(){
+    allWordSpans.forEach(s => s.classList.remove("selected","noun","verb"));
+  }
+
+  function showInfo(key){
+    const data = WORD_DATA[key];
+    const title = data.label || key;
+
+    const translit = data.translit || "—";
+    const defAr = data.def_ar || "—";
+    const defEn = data.def_en || "—";
+
+    const typeLabel = data.type === "verb" ? "فعل" : "اسم/مفردة";
+    const typeClass = data.type === "verb" ? "verb" : "noun";
+    const hasImage = data.type === "noun" && !!data.image;
+
+    const imgBlock = hasImage ? `
+      <div class="image-box">
+        <img id="infoImg" src="${assetUrl(data.image)}" alt="${title}">
+        <div id="imgErr" class="img-error">⚠️ الصورة لا تظهر. تأكدي من اسم الملف داخل GitHub.</div>
+      </div>
+    ` : `<div class="muted"></div>`;
+
+    infoContent.innerHTML = `
+      <div class="info-word">${title}</div>
+      <div class="info-badges">
+        <span class="badge ${typeClass}"><span class="dot"></span>${typeLabel}</span>
+      </div>
+      <div class="info-translit">${translit}</div>
+      <div class="two-col">
+        <div class="info-def"><span class="label">التعريف (عربي)</span>${defAr}</div>
+        <div class="info-def" style="direction:ltr;text-align:left;"><span class="label">Definition (English)</span>${defEn}</div>
+      </div>
+      ${imgBlock}
+      <button class="audio-btn" id="wordAudioBtn" ${data.audio ? "" : "disabled"}>
+        <i data-lucide="volume-2"></i> Listen
+      </button>
+    `;
+    lucide.createIcons();
+
+    if(hasImage){
+      const img = document.getElementById("infoImg");
+      const err = document.getElementById("imgErr");
+      if(img && err){
+        img.onerror = () => { err.style.display = "block"; };
+        img.onload  = () => { err.style.display = "none"; };
+      }
+    }
+
+    const btn = document.getElementById("wordAudioBtn");
+    if(btn) btn.addEventListener("click", ()=> data.audio && playWordAudio(data.audio));
+  }
+
+  // ✅ Click a word: show info + show/play scene only when mapped
+  textContainer.addEventListener("click", (e) => {
+    const w = e.target.closest(".w");
+    if(!w) return;
+
+    const key = w.dataset.key;
+
+    clearSelected();
+    w.classList.add("selected");
+
+    if(LIVE_KEYS.has(key)){
+      const type = WORD_DATA[key].type || "noun";
+      w.classList.add(type);
+      showInfo(key);
+    }else{
+      infoContent.innerHTML = `<div class="muted"></div>`;
+    }
+
+    const sceneFile = sceneForKey(key);
+    if(sceneFile){
+      showAndPlayScene(sceneFile, key);
+    }else{
+      hideScene();
+    }
+  });
+
+  renderLines(LINES);
+  hideScene(); // start hidden
+});
+</script>
+</body>
+</html>
